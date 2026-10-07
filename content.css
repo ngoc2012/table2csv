@@ -1,0 +1,4 @@
+li:hover {
+  outline: 2px solid #e63946 !important;
+  outline-offset: -2px;
+}
