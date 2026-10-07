@@ -1,4 +1,6 @@
-li:hover {
+ul:hover,
+ol:hover,
+table:hover {
   outline: 2px solid #e63946 !important;
   outline-offset: -2px;
 }

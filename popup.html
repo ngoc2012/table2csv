@@ -15,22 +15,24 @@
         white-space: nowrap;
       }
       th { background: #f4f4f4; text-align: left; }
-      #exportBtn {
-        display: none;
+      button {
         width: 100%;
         padding: 6px;
-        background: #e63946;
-        color: #fff;
         border: none;
         border-radius: 4px;
         cursor: pointer;
         font-weight: 600;
+        margin-bottom: 6px;
       }
+      #scanBtn { background: #1d3557; color: #fff; }
+      #scanBtn:hover { background: #142844; }
+      #exportBtn { display: none; background: #e63946; color: #fff; }
       #exportBtn:hover { background: #d62839; }
     </style>
   </head>
   <body>
-    <p id="status">Scanning page…</p>
+    <p id="status">Click Scan to detect a list/table on this page.</p>
+    <button id="scanBtn">Scan Page</button>
     <div id="preview"></div>
     <button id="exportBtn">Export CSV</button>
     <script src="popup.js"></script>

@@ -81,17 +81,17 @@ function leavesOf(li) {
   return leaves;
 }
 
-// ponytail: single best list only, no multi-table support — pick the ul with
-// the most li rows that actually carry text.
+// ponytail: single best list only, no multi-table support — pick the ul/ol
+// with the most li rows that actually carry text.
 function findBestList() {
-  const uls = Array.from(document.querySelectorAll('ul'));
+  const lists = Array.from(document.querySelectorAll('ul, ol'));
   let best = null;
   let bestScore = 0;
-  for (const ul of uls) {
-    const score = getLiRows(ul).filter((li) => leavesOf(li).length > 0).length;
+  for (const list of lists) {
+    const score = getLiRows(list).filter((li) => leavesOf(li).length > 0).length;
     if (score > bestScore) {
       bestScore = score;
-      best = ul;
+      best = list;
     }
   }
   return best;
@@ -159,24 +159,20 @@ function download(filename, text) {
   URL.revokeObjectURL(url);
 }
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg.type === 'SCAN') {
-    const ul = findBestList();
-    if (!ul) {
-      sendResponse({ found: false });
-      return;
-    }
-    const { columns, rows } = extract(ul);
-    sendResponse({ found: true, columns, totalRows: rows.length, previewRows: rows.slice(0, 2) });
-  } else if (msg.type === 'EXPORT') {
-    const ul = findBestList();
-    if (!ul) {
-      sendResponse({ ok: false });
-      return;
-    }
-    const { columns, rows } = extract(ul);
+// Exposed on window so popup.js can call it via chrome.scripting.executeScript
+// after injecting this file on demand — no content_script/reload needed.
+window.__t2csv = {
+  scan() {
+    const list = findBestList();
+    if (!list) return { found: false };
+    const { columns, rows } = extract(list);
+    return { found: true, columns, totalRows: rows.length, previewRows: rows.slice(0, 2) };
+  },
+  exportCSV() {
+    const list = findBestList();
+    if (!list) return { ok: false };
+    const { columns, rows } = extract(list);
     download('table-export.csv', toCSV(columns, rows));
-    sendResponse({ ok: true, totalRows: rows.length });
-  }
-  return true;
-});
+    return { ok: true, totalRows: rows.length };
+  },
+};
